@@ -1,0 +1,29 @@
+pipeline {
+  agent any 
+  environment {
+    DOCKER_CREDENTIALS = credentials('docker-hun-credentials')
+   }
+
+stages {
+   stage('Build') {
+    steps {
+      script {
+          // login docker 
+           withcredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')] {
+            sh "docker login -u ${DOCKER_USERNAME} -P ${DOCKER_PASSWORD}"
+            }
+           // Build your imgae
+            sh "docker build -t ${DOCKER_USERNAME}/devops-react-app:latest ."
+         }
+       }
+     }
+     stages('Push to Docker Hub') {
+        steps {
+           script {
+                // push the images to docker hub 
+               sh "docker push ${DOCKER_USERNAME}/devops-react-app:latest"
+            }
+        }
+     }
+   }
+ }
