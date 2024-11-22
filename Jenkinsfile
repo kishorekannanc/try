@@ -5,13 +5,36 @@ pipeline {
    }
 
 stages {
+
+   stage('Build') {
+    steps {
+      script {
+
    stage('pull docker image') {
            steps {
               script {
+
           // login docker 
            withcredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')] {
             sh "docker login -u ${DOCKER_USERNAME} -P ${DOCKER_PASSWORD}"
             }
+
+           // Build your imgae
+            sh "docker build -t ${DOCKER_USERNAME}/dev:latest ."
+         }
+       }
+     }
+     stages('Push to Docker Hub') {
+        steps {
+           script {
+                // push the images to docker hub 
+               sh "docker push ${DOCKER_USERNAME}/dev:latest"
+            }
+        }
+     }
+   }
+ }
+
 
             // pull the latest images from docker hub with the prod tag
             sh "docker pull ${DOCKER_USERNAME}/prod:prod"
@@ -48,3 +71,4 @@ stages {
             }
          }
    }
+
