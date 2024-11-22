@@ -64,7 +64,7 @@ stages {
 
      post {
          success {
-               echo "successfull"
+               echo "successfullkanna"
             }
           failure {
                 echo "failed"
